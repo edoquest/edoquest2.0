@@ -1,36 +1,43 @@
 
-define(['entity'], function(Entity) {
-
-    var Item = Entity.extend({
-        init: function(id, kind, type) {
-    	    this._super(id, kind);
-
-            this.itemKind = Types.getKindAsString(kind);
-    	    this.type = type;
-    	    this.wasDropped = false;
-        },
-
-        hasShadow: function() {
-            return true;
-        },
-
-        onLoot: function(player) {
-            if(this.type === "weapon") {
-                player.switchWeapon(this.itemKind);
-            }
-            else if(this.type === "armor") {
-                player.armorloot_callback(this.itemKind);
-            }
-        },
-
-        getSpriteName: function() {
-            return "item-"+ this.itemKind;
-        },
-
-        getLootMessage: function() {
-            return this.lootMessage;
-        }
-    });
+module.exports = Item = Entity.extend({
+    init: function(id, kind, x, y) {
+        this._super(id, "item", kind, x, y);
+        this.isStatic = false;
+        this.isFromChest = false;
+    },
     
-    return Item;
+    handleDespawn: function(params) {
+        var self = this;
+        
+        this.blinkTimeout = setTimeout(function() {
+            params.blinkCallback();
+            self.despawnTimeout = setTimeout(params.despawnCallback, params.blinkingDuration);
+        }, params.beforeBlinkDelay);
+    },
+    
+    destroy: function() {
+        if(this.blinkTimeout) {
+            clearTimeout(this.blinkTimeout);
+        }
+        if(this.despawnTimeout) {
+            clearTimeout(this.despawnTimeout);
+        }
+        
+        if(this.isStatic) {
+            this.scheduleRespawn(30000);
+        }
+    },
+    
+    scheduleRespawn: function(delay) {
+        var self = this;
+        setTimeout(function() {
+            if(self.respawn_callback) {
+                self.respawn_callback();
+            }
+        }, delay);
+    },
+    
+    onRespawn: function(callback) {
+        this.respawn_callback = callback;
+    }
 });

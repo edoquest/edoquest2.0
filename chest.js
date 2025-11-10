@@ -1,29 +1,23 @@
 
-define(['entity'], function(Entity) {
+var Utils = require('./utils'),
+    Types = require("../../shared/js/gametypes");
 
-    var Chest = Entity.extend({
-        init: function(id, kind) {
-    	    this._super(id, Types.Entities.CHEST);
-        },
+module.exports = Chest = Item.extend({
+    init: function(id, x, y) {
+        this._super(id, Types.Entities.CHEST, x, y);
+    },
     
-        getSpriteName: function() {
-            return "chest";
-        },
+    setItems: function(items) {
+        this.items = items;
+    },
     
-        isMoving: function() {
-            return false;
-        },
-    
-        open: function() {
-            if(this.open_callback) {
-                this.open_callback();
-            }
-        },
-    
-        onOpen: function(callback) {
-            this.open_callback = callback;
+    getRandomItem: function() {
+        var nbItems = _.size(this.items),
+            item = null;
+
+        if(nbItems > 0) {
+            item = this.items[Utils.random(nbItems)];
         }
-    });
-    
-    return Chest;
+        return item;
+    }
 });
