@@ -1,23 +1,42 @@
-BrowserQuest client documentation
+BrowserQuest server documentation
 =================================
 
-The client directory should never be directly deployed to staging/production. Deployment steps:
+The game server currently runs on nodejs v0.4.7 (but should run fine on the latest stable as well) and requires the latest versions of the following npm libraries:
 
-1) Configure the websocket host/port:
+- underscore
+- log
+- bison
+- websocket
+- websocket-server
+- sanitizer
+- memcache (only if you want metrics)
 
-In the client/config/ directory, copy config_build.json-dist to a new config_build.json file.
-Edit the contents of this file to change host/port settings.
+All of them can be installed via `npm install -d` (this will install a local copy of all the dependencies in the node_modules directory)
 
-2) Run the following commands from the project root:
 
-(Note: nodejs is required to run the build script)
+Configuration
+-------------
 
-* cd bin
-* chmod +x build.sh
-* ./build.sh
+The server settings (number of worlds, number of players per world, etc.) can be configured.
+Copy `config_local.json-dist` to a new `config_local.json` file, then edit it. The server will override default settings with this file.
 
-This will use the RequireJS optimizer tool to create a client-build/ directory containing a production-ready version of BrowserQuest. 
 
-A build log file will also be created at bin/build.txt.
+Deployment
+----------
 
-The client-build directory can be renamed and deployed anywhere. It has no dependencies to any other file/folder in the repository.
+In order to deploy the server, simply copy the `server` and `shared` directories to the staging/production server.
+
+Then run `node server/js/main.js` in order to start the server.
+
+
+Note: the `shared` directory is the only one in the project which is a server dependency.
+
+
+Monitoring
+----------
+
+The server has a status URL which can be used as a health check or simply as a way to monitor player population.
+
+Send a GET request to: `http://[host]:[port]/status`
+
+It will return a JSON array containing the number of players in all instanced worlds on this game server.
