@@ -2,7 +2,7 @@ const express = reqire ("express") ;
 const path =  require ("path") ;
 const app = express () ;
 
-//Serve tutti i file della cartella principale (edoquest2.0
+//Serve tutti i file della cartella principale 
 app.use(express.static(___dirname)) ;
 
 // porta per Render o locale
